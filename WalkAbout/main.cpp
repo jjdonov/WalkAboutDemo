@@ -1,32 +1,17 @@
-/******************************************
+/*************************************************************
  *
- * Official Name:  John Donovan
- *
- * Nickname:  John
- *
- * E-mail: jdonovan@syr.edu
- *
- * Assignment:  Haunted Room
- *
- * Environment/Compiler:  Xcode
- *
- * Date:  November 8, 2011
+ * John Donovan
  *
  *
  *
- *******************************************
+ **************************************************************
+ * Special thanks to:
+ *      +   Swiftless's tutorial for getting mouseMotion
+ *          working with looking around
  *
- *Special thanks to:
- *
- *	Swiftless's tutorial for getting mouseMotion
- *	working with looking around
- *
- *	Nature Wizard Tutorial 8 for the particle
- *	engine!
- *
- *
- *
- *******************************************/
+ *      +   Nature Wizard Tutorial 8 for the particle
+ *          engine!
+ **************************************************************/
 using namespace std;
 
 #include <cmath>
@@ -43,13 +28,12 @@ using namespace std;
 #  include <GL/glut.h>
 #endif
 
-/* CONSTANTS */
-#define PI 3.14159265
-#define SPACEBAR 32
-#define JMP -1.0
-#define MAXPARTICLES 1000
-#define DRAINRATE 0.5
-#define CHARGERATE 0.25
+//Custom Header Files
+#include "Constants.h"
+#include "Particle.h"
+#include "BitMapFile.h"
+#include "LockableDoor.h"
+
 
 /* GLOBALS */
 bool* keyStates = new bool[256];
@@ -62,7 +46,7 @@ static float centerX = 0.0;
 static float centerY = 2.0;
 static float centerZ = -10.0;
 static float theta = 90.0;
-static float phi =0.0;
+static float phi = 0.0;
 static float upX = 0.0;
 static float upY = 1.0;
 static float upZ = 0.0;
@@ -102,52 +86,16 @@ static unsigned int closestName = 0; // Name of closest hit.
 
 static int DoorCode[3] = {1,0,1};
 static int keypad[3] = {0,0,0};
-/*******************************************/
-// Routine to read a bitmap file.
-// Works only for uncompressed bmp files of 24-bit color.
-// Struct of bitmap file.
+
+
 //Person Attributes
 static bool isJumping=false;
 static float jumpVal= JMP;
-
 string myName;
-
-struct BitMapFile
-{
-    int sizeX;
-    int sizeY;
-    unsigned char *data;
-};
-
-struct particle
-{
-    float lifetime;                       // total lifetime of the particle
-    float decay;                          // decay speed of the particle
-    float xpos,ypos,zpos;                 // position of the particle
-    float xspeed,yspeed,zspeed;           // speed of the particle
-    bool active;							// is particle active or not?
-    
-    particle()
-    {
-        lifetime = rand()%100; //change to random
-        decay = float(rand() % 5); // change to random
-        xpos = 15.0 + float(rand()%15);
-        zpos = -32.0 - float(rand()%4);
-        ypos = 0.0;
-        xspeed = sin((fire*PI)/180.0);
-        yspeed = float((rand()%100 + 1) / 500.0);//250.0);
-        zspeed = 0.0;
-        active = true;
-    }
-};
 
 //static particle testParticle= *(new particle());
 static particle ourParticles[MAXPARTICLES];
-struct lockableDoor
-{
-	bool locked;
-	float openFactor;
-};
+
 
 lockableDoor lockedDoors[3];
 
@@ -1557,10 +1505,6 @@ void drawKey()
 	glRotatef( (fire*PI)/180.0 , 0.0, 1.0, 0.0);
 	glBindTexture(GL_TEXTURE_2D, texture[9]);
 	glBegin(GL_POLYGON);
-	/*glTexCoord2f(0.0,0.0); glVertex3f(-27.5, 0.5, -32.0);
-     glTexCoord2f(1.0, 0.0); glVertex3f(-28.0, 0.5, -32.0);
-     glTexCoord2f(1.0, 1.0); glVertex3f(-28.0, 1.0, -32.0);
-     glTexCoord2f(0.0,1.0); glVertex3f(-27.5, 1.0, -32.0);*/
 	glTexCoord2f(0.0,0.0); glVertex3f(-0.25, 0.5, 0.0);
 	glTexCoord2f(1.0, 0.0); glVertex3f(0.25, 0.5, 0.0);
 	glTexCoord2f(1.0, 1.0); glVertex3f(0.25, 1.0, 0.0);
@@ -1636,16 +1580,6 @@ void drawHUD()
 
 void drawGrass()
 {
-	/*Grass*/
-	/*glFrontFace(GL_CW);
-     glBindTexture(GL_TEXTURE_2D, texture[1]);
-     glBegin(GL_POLYGON);
-     glTexCoord2f(0.0f, 0.0f); glVertex3f(-50.0,0.0,-5.0);
-     glTexCoord2f(5.0f, 0.0f); glVertex3f(50.0,0.0,-5.0);
-     glTexCoord2f(5.0f, 5.0f); glVertex3f(50.0,0.0,-100.0);
-     glTexCoord2f(0.0f, 5.0f); glVertex3f(-50.0,0.0,-100.0);
-     glEnd();
-     glFrontFace(GL_CCW);*/
 	glBindTexture(GL_TEXTURE_2D, texture[1]);
 	float x,z;
 	for (z=0.0; z >-100.0; z-=1.0)
@@ -1681,9 +1615,6 @@ void drawSelectable()
 void drawScene(void)
 {
 	glDisable(GL_LIGHT1);
-	//sprint=false;
-	//croutch=false;
-	//slowWalk=false;
 	keyOperations();
 	drawSelectable();
 	//Light property vectors
@@ -1693,7 +1624,6 @@ void drawScene(void)
 	float globAmb[] = {0.1, 0.1, 0.1, 1.0 };
 	
 	float radius = sqrt((centerX-eyeX)*(centerX-eyeX) + (centerY-eyeY)*(centerY-eyeY) + (centerZ-eyeZ)*(centerZ-eyeZ));
-	//float *dirVec = getDirectionVector3();
 	float distanceToKey = sqrt((eyeX+27.5)*(eyeX+27.5) + (eyeZ+32.0)*(eyeZ+32.0));
 	cout << distanceToKey << endl;
 	if(distanceToKey < 1.0)
@@ -1701,30 +1631,16 @@ void drawScene(void)
 		cout << "GOT DA KEY" << endl;
 		lockedDoors[1].locked = false;
 	}
-	//SpotLight property vectors
 	float spotAmb[] = {0.0,0.0,0.0,1.0};
 	float spotDifAndSpec[] = {1.0,1.0,1.0,1.0};
-	//float spotPos[] = {eyeX-2*dirVec[0],eyeY-2*dirVec[1], eyeZ-2*dirVec[3], 1.0};
 	float spotPos[] = {eyeX,eyeY, eyeZ, 1.0};
 	float spotDirection[]= { (centerX-eyeX)/radius, (centerY-eyeY)/radius, (centerZ-eyeZ)/radius};
 	float spotExponent = 15.0; // Spotlight exponent = attenuation.
 	float spotAngle = 90.0;
 	
-	/*glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-     glLoadIdentity();
-     glPushMatrix();
-     gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);*/
-	
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb); // Global ambient light.
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Enable two-sided lighting. NEED THIS?
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, localViewer); // Enable local viewpoint
-	
-	//Light0 properties
-	/*glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
-     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec0);
-     glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec0);
-     glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
-     glEnable(GL_LIGHT0);*/
 	
 	//Spotlight Properties::LIGHT1
 	if(flashLightOn && flashLightBattery > 0.0)
@@ -1759,7 +1675,6 @@ void drawScene(void)
 		evolveParticle(i);
 	}
 	drawSky();
-	//drawWall();
 	drawWallWithDoorHole();
 	drawDoor();
 	drawLockedDoor1();
@@ -1781,20 +1696,8 @@ void drawScene(void)
 	glEnable(GL_TEXTURE);
 	if(lockedDoors[1].locked)
         drawKey();
-	/*Outside Ground*/
-	/*Grass*/
-	/*glFrontFace(GL_CW);
-     glBindTexture(GL_TEXTURE_2D, texture[1]);
-     glBegin(GL_POLYGON);
-     glTexCoord2f(0.0f, 0.0f); glVertex3f(-50.0,0.0,-5.0);
-     glTexCoord2f(5.0f, 0.0f); glVertex3f(50.0,0.0,-5.0);
-     glTexCoord2f(5.0f, 5.0f); glVertex3f(50.0,0.0,-100.0);
-     glTexCoord2f(0.0f, 5.0f); glVertex3f(-50.0,0.0,-100.0);
-     glEnd();
-     glFrontFace(GL_CCW);*/
 	drawGrass();
 	drawWalkWay();
-	
 	glPopMatrix();
 	glPushMatrix();
 	drawHUD();
@@ -1823,7 +1726,6 @@ void findClosestHit(int hits, unsigned int buffer[])
         }
         else ptr += 3;
     }
-    //if (closestName != 0) highlightFrames = 10;
 }
 
 
@@ -1834,10 +1736,9 @@ void mouseControl(int button, int state, int x, int y)
 	int viewport[4]; // Viewport data.
     if((button==GLUT_LEFT_BUTTON) && (state==GLUT_DOWN))
     {
-		glGetIntegerv(GL_VIEWPORT, viewport); // Get viewport data.
-		
-		glSelectBuffer(1024, buffer); // Specify buffer to write hit records in selection mode
-		(void) glRenderMode(GL_SELECT); // Enter selection mode.
+		glGetIntegerv(GL_VIEWPORT, viewport);   // Get viewport data.
+		glSelectBuffer(1024, buffer);           // Specify buffer to write hit records in selection mode
+		(void) glRenderMode(GL_SELECT);         // Enter selection mode.
 		
 		// Save the viewing volume defined in the resize routine.
 		glMatrixMode(GL_PROJECTION);
@@ -1845,17 +1746,14 @@ void mouseControl(int button, int state, int x, int y)
 		
 		// Define a viewing volume corresponding to selecting in 3 x 3 region around the cursor.
 		glLoadIdentity();
-		//gluPickMatrix((float)x, (float)(viewport[3] - y), 3.0, 3.0, viewport); //is this the issue?
 		gluPickMatrix((float)500.0, (float)(viewport[3]-500.0),1.0,1.0,viewport);
-		gluPerspective(45.0,1.0,0.1,102.0);// Copied from the reshape routine.
+		gluPerspective(45.0,1.0,0.1,102.0);     // Copied from the reshape routine.
 		
-		glMatrixMode(GL_MODELVIEW); // Return to modelview mode before drawing.
+		glMatrixMode(GL_MODELVIEW);             // Return to modelview mode before drawing.
 		glLoadIdentity();
 		
-		glInitNames(); // Initializes the name stack to empty.
-		glPushName(0); // Puts name 0 on top of stack.
-		
-		// Determine hits by calling drawBallAndTorus() so that names are assigned.
+		glInitNames();  // Initializes the name stack to empty.
+		glPushName(0);  // Puts name 0 on top of stack.
 		
 		drawSelectable();
 		
@@ -1870,7 +1768,6 @@ void mouseControl(int button, int state, int x, int y)
 		findClosestHit(hits, buffer);
 		glutPostRedisplay();
         
-        
         if(closestName == 1)
         {
 			keypad[0] = !keypad[0];
@@ -1883,9 +1780,7 @@ void mouseControl(int button, int state, int x, int y)
         {
 			keypad[2] = !keypad[2];
         }
-        
     }
-    
 	if(keypad[0] == 1 && keypad[1]==1)
 		lockedDoors[0].locked=false;
 	glutPostRedisplay();
@@ -1919,22 +1814,15 @@ void animate(int value)
 {
 	float distanceToDoor1 = sqrt((eyeX-0)*(eyeX-0) + (eyeZ+14)*(eyeZ+14));
 	float distanceToDoor2 = sqrt((eyeX-0)*(eyeX-0) + (eyeZ+19.0)*(eyeZ+19.0));
-	float distanceToDoor3= sqrt((eyeX-15.0)*(eyeX-15.0) + (eyeZ+26.5)*(eyeZ+26.5));
+	float distanceToDoor3 = sqrt((eyeX-15.0)*(eyeX-15.0) + (eyeZ+26.5)*(eyeZ+26.5));
 	if(isJumping)
 	{
 		cout << "jumpVal: " << jumpVal << endl;
-		//y=a(x-r1)(x-r2)
-		//r1,r2 are x intercepts
-		//-1*(jumpVal-1)(jumpVal+1)
-		//eyeY += -1*(jumpVal-1.0)*(jumpVal+1.0);
-		//centerY  += -1*(jumpVal-1.0)*(jumpVal+1.0);
 		eyeY+= 2*(-0.5*jumpVal);
 		centerY+= 2*(-0.5*jumpVal);
 		jumpVal+=0.4;
 		if(jumpVal >= 1.1)
 		{
-			//eyeY = 2.0;
-			//centerY = 2.0;
 			isJumping = false;
 			jumpVal = JMP;
 		}
@@ -2034,14 +1922,13 @@ void resize(int w, int h)
 // Routine to output interaction instructions to the C++ window.
 void printInteraction(void)
 {
-    cout << "Welcome to my final project!" << endl;
+    cout << "Welcome to my WalkAbout!" << endl;
 	cout << "This is a simple first person game." <<endl;
 	cout << "The goal is to open the locked doors and make it to the end...alive." << endl;
 	cout << "For the first door, you must enter the correct pass code" << endl;
-	cout << "W walks forward,\nS walks backwards,\nA strafes left and,\nD strafes right"<<endl;
-	cout << "Look Around using the mouse."<<endl;
-	
-	cout << "Please enter your name:" ;
+	cout << "W walks forward,\nS walks backwards,\nA strafes left and,\nD strafes right" << endl;
+	cout << "Look Around using the mouse." << endl;
+	cout << "To start the game, please enter your name: " ;
 	cin >>  myName;
     //add directions for interaction
 }
@@ -2076,20 +1963,12 @@ void keyPressed(unsigned char key, int x, int y)
         keyStates[key] = true;
     glutPostRedisplay();
 }
+
 void keyUp(unsigned char key, int x, int y)
 {
 	keyStates[key] = false;
     glutPostRedisplay();
 }
-
-
-
-//controls while user idle
-/*void idle()
- {
- 
- }*/
-
 
 // Main routine.
 int main(int argc, char **argv) 
@@ -2100,7 +1979,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE| GLUT_RGB | GLUT_DEPTH); 
     glutInitWindowSize(1000, 1000);
     glutInitWindowPosition(0, 0); 
-    glutCreateWindow("FINAL PROJ");
+    glutCreateWindow("WALK ABOUT");
     setup(); 
     glutDisplayFunc(drawScene); 
     glutReshapeFunc(resize);  

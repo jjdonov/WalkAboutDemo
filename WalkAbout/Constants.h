@@ -1,0 +1,7 @@
+/* CONSTANTS */
+#define PI 3.14159265
+#define SPACEBAR 32
+#define JMP -1.0
+#define MAXPARTICLES 1000
+#define DRAINRATE 0.5
+#define CHARGERATE 0.25

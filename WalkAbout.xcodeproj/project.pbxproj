@@ -34,6 +34,10 @@
 		6C2873F718DDE38D00CB4896 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6C2873F918DDE39A00CB4896 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		6C2873FB18DDE3A100CB4896 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		6C2873FD18DDED8200CB4896 /* BitMapFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitMapFile.h; sourceTree = "<group>"; };
+		6C2873FE18DDEE4F00CB4896 /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particle.h; sourceTree = "<group>"; };
+		6C2873FF18DDEEB700CB4896 /* LockableDoor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockableDoor.h; sourceTree = "<group>"; };
+		6C28740018DDEEDB00CB4896 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,10 +76,38 @@
 		6C2873ED18DDE36800CB4896 /* WalkAbout */ = {
 			isa = PBXGroup;
 			children = (
-				6C2873EE18DDE36800CB4896 /* main.cpp */,
-				6C2873F018DDE36800CB4896 /* WalkAbout.1 */,
+				6C28740218DDF1BC00CB4896 /* resources */,
+				6C28740118DDF1AC00CB4896 /* src */,
 			);
 			path = WalkAbout;
+			sourceTree = "<group>";
+		};
+		6C28740118DDF1AC00CB4896 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6C2873EE18DDE36800CB4896 /* main.cpp */,
+				6C2873FE18DDEE4F00CB4896 /* Particle.h */,
+				6C2873F018DDE36800CB4896 /* WalkAbout.1 */,
+				6C2873FD18DDED8200CB4896 /* BitMapFile.h */,
+				6C2873FF18DDEEB700CB4896 /* LockableDoor.h */,
+				6C28740018DDEEDB00CB4896 /* Constants.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		6C28740218DDF1BC00CB4896 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				6C28740318DDF1C600CB4896 /* textures */,
+			);
+			name = resources;
+			sourceTree = "<group>";
+		};
+		6C28740318DDF1C600CB4896 /* textures */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = textures;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
