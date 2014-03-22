@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		6C2873EF18DDE36800CB4896 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2873EE18DDE36800CB4896 /* main.cpp */; };
 		6C2873F118DDE36800CB4896 /* WalkAbout.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6C2873F018DDE36800CB4896 /* WalkAbout.1 */; };
+		6C2873F818DDE38D00CB4896 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C2873F718DDE38D00CB4896 /* Cocoa.framework */; };
+		6C2873FA18DDE39A00CB4896 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C2873F918DDE39A00CB4896 /* GLUT.framework */; };
+		6C2873FC18DDE3A100CB4896 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C2873FB18DDE3A100CB4896 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +31,9 @@
 		6C2873EB18DDE36800CB4896 /* WalkAbout */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = WalkAbout; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C2873EE18DDE36800CB4896 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6C2873F018DDE36800CB4896 /* WalkAbout.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = WalkAbout.1; sourceTree = "<group>"; };
+		6C2873F718DDE38D00CB4896 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		6C2873F918DDE39A00CB4896 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		6C2873FB18DDE3A100CB4896 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +41,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C2873FC18DDE3A100CB4896 /* OpenGL.framework in Frameworks */,
+				6C2873FA18DDE39A00CB4896 /* GLUT.framework in Frameworks */,
+				6C2873F818DDE38D00CB4896 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +53,9 @@
 		6C2873E218DDE36800CB4896 = {
 			isa = PBXGroup;
 			children = (
+				6C2873FB18DDE3A100CB4896 /* OpenGL.framework */,
+				6C2873F918DDE39A00CB4896 /* GLUT.framework */,
+				6C2873F718DDE38D00CB4896 /* Cocoa.framework */,
 				6C2873ED18DDE36800CB4896 /* WalkAbout */,
 				6C2873EC18DDE36800CB4896 /* Products */,
 			);
