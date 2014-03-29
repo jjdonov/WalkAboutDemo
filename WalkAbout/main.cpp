@@ -21,6 +21,8 @@ using namespace std;
 #include <vector>
 #include <fstream>
 #include <string>
+#include <vector>
+#include<unistd.h>
 //#include "character.h"
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
@@ -50,18 +52,18 @@ static float phi = 0.0;
 static float upX = 0.0;
 static float upY = 1.0;
 static float upZ = 0.0;
-static bool sprint=false;
-static bool croutch=false;
-static bool slowWalk=false;
+static bool sprint = false;
+static bool croutch = false;
+static bool slowWalk = false;
 
 static int animationPeriod = 100;
 //TEXTURE GLOABLS
 
-int wrap=1;
+int wrap = 1;
 static unsigned int texture[10];
 
-static int lastX=500;
-static int lastY=500;
+static int lastX = 500;
+static int lastY = 500;
 //for FOG
 static int fogMode = GL_LINEAR; // Fog mode.
 static float fogDensity = 0.01; // Fog density.
@@ -151,6 +153,10 @@ BitMapFile *getBMPData(string filename)
     
     // Read input file name.
     ifstream infile(filename.c_str(), ios::binary);
+    if(infile)
+        cout << "file named : " << filename << " exists" << endl;
+    else
+        cout << "file named : " << filename << " does not exist" << endl;
     
     // Get the starting point of the image data.
     infile.seekg(10);
@@ -193,15 +199,56 @@ void initLocks()
 	}
 }
 
+
+void smartLoadExternalTextures()
+{
+    BitMapFile *image;
+    string fileNames[] = {"rock.bmp", "grass.bmp", "brickwork_texture.bmp",
+                        "metalDoor.bmp", "metalPanel.bmp", "grungeWalls.bmp",
+                        "interiorFloors.bmp", "tile.bmp", "fire.bmp", "keycard.bmp"
+    };
+    vector<string> filevec(fileNames, fileNames + sizeof(fileNames) / sizeof(string));
+    vector<string>::iterator itr = filevec.begin();
+    while(itr != filevec.end())
+    {
+        image = getBMPData(*itr);
+        // Bind wood image to texture index[0].
+        glBindTexture(GL_TEXTURE_2D, texture[0]);
+        // if wrap is true, the texture repeats, ignoring integer part
+        //	... false, the texture does not go beyond 1.
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap ? GL_REPEAT : GL_CLAMP );
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap ? GL_REPEAT : GL_CLAMP );
+        // select modulate to mix texture with color for shading
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        // when texture area is small, bilinear filter the closest mipmap
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST );
+        // when texture area is large, bilinear filter the first mipmap
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        // when texture area is small, bilinear filter the closest mipmap
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST );
+        // when texture area is large, bilinear filter the first mipmap
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->sizeX, image->sizeY, 0,
+                     GL_RGB, GL_UNSIGNED_BYTE, image->data);
+        // build our texture mipmaps
+        gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image->sizeX, image->sizeY,GL_RGB, GL_UNSIGNED_BYTE, image->data );
+        ++itr;
+    }
+}
+
 // Load external textures.
 void loadExternalTextures()
 {
+    char wd[1024];
+    std::cout << getcwd(wd, sizeof(wd)) << std::endl;
+    
     // Local storage for bmp image data.
     BitMapFile *image[10];
     
     // Load the textures.
     //first texture
-    image[0] = getBMPData("rock.bmp");
+    string path = "/Users/johndonovan/Desktop/bmp/rock.bmp";
+    image[0] = getBMPData(path);
     
     // Bind wood image to texture index[0].
     glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -231,7 +278,8 @@ void loadExternalTextures()
     
     
     //second texture Grass
-    image[1] = getBMPData("grass.bmp");
+    image[1] = getBMPData("/Users/johndonovan/Desktop/bmp/grass.bmp");
+   
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[1]);
@@ -260,7 +308,7 @@ void loadExternalTextures()
     gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image[1]->sizeX, image[1]->sizeY,GL_RGB, GL_UNSIGNED_BYTE, image[1]->data );
     
     //Third texture Brick
-    image[2] = getBMPData("brickwork-texture.bmp");
+    image[2] = getBMPData("/Users/johndonovan/Desktop/bmp/brickwork-texture.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[2]);
@@ -289,7 +337,7 @@ void loadExternalTextures()
     gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image[2]->sizeX, image[2]->sizeY,GL_RGB, GL_UNSIGNED_BYTE, image[2]->data );
     
     //Fourth texture Metal Door
-    image[3] = getBMPData("metalDoor.bmp");
+    image[3] = getBMPData("/Users/johndonovan/Desktop/bmp/metalDoor.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[3]);
@@ -318,7 +366,7 @@ void loadExternalTextures()
     gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image[3]->sizeX, image[3]->sizeY,GL_RGB, GL_UNSIGNED_BYTE, image[3]->data );
     
     //Fifth texture for door Panel
-    image[4] = getBMPData("metalPanel.bmp");
+    image[4] = getBMPData("/Users/johndonovan/Desktop/bmp/metalPanel.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[4]);
@@ -349,7 +397,7 @@ void loadExternalTextures()
     //**
     
     //Sixth texture for grungyWalls
-    image[5] = getBMPData("grungeWall.bmp");
+    image[5] = getBMPData("/Users/johndonovan/Desktop/bmp/grungeWall.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[5]);
@@ -380,7 +428,7 @@ void loadExternalTextures()
     //**
     
     //Seventh texture for interior floor
-    image[6] = getBMPData("interiorFloor.bmp");
+    image[6] = getBMPData("/Users/johndonovan/Desktop/bmp/interiorFloor.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[6]);
@@ -411,7 +459,7 @@ void loadExternalTextures()
     //**
     
     //Eight texture for interior cieling
-    image[7] = getBMPData("tile.bmp");
+    image[7] = getBMPData("/Users/johndonovan/Desktop/bmp/tile.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[7]);
@@ -440,7 +488,7 @@ void loadExternalTextures()
     gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image[7]->sizeX, image[7]->sizeY,GL_RGB, GL_UNSIGNED_BYTE, image[7]->data );
     
     //Ninth texture for interior cieling
-    image[8] = getBMPData("fire.bmp");
+    image[8] = getBMPData("/Users/johndonovan/Desktop/bmp/fire.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[8]);
@@ -469,7 +517,7 @@ void loadExternalTextures()
     gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image[8]->sizeX, image[8]->sizeY,GL_RGB, GL_UNSIGNED_BYTE, image[8]->data );
     
     //Tenth texture for interior cieling
-    image[9] = getBMPData("keycard.bmp");
+    image[9] = getBMPData("/Users/johndonovan/Desktop/bmp/keycard.bmp");
     
     // Bind smallgrass image to texture index[1].
     glBindTexture(GL_TEXTURE_2D, texture[9]);
@@ -573,6 +621,7 @@ int getRegion()
 
 bool collisionInRegion(int region)
 {
+    return false;
 	cout << "IN REGION: " << region << endl;
 	if(region==1)
 	{
@@ -594,7 +643,7 @@ bool collisionInRegion(int region)
     
 	if(region==3)
 	{
-		if (!croutch && (eyeX < -20.0 || eyeX >15.0 || eyeZ <= -34.0 || (eyeZ > -19.0 && eyeX < -1.0) || ( eyeZ > -19.0 && eyeX > 1.0)));
+		if (!croutch && (eyeX < -20.0 || eyeX >15.0 || eyeZ <= -34.0 || (eyeZ > -19.0 && eyeX < -1.0) || ( eyeZ > -19.0 && eyeX > 1.0)))
 		{
 			cout << "Collission in region 3" << endl;
 			cout << "EyeX: " << eyeX<< "eyeZ: " <<eyeZ<<endl;
@@ -618,7 +667,6 @@ bool collisionInRegion(int region)
 
 void keyOperations()
 {
-    
 	float *dirVec = getDirectionVector();
 	if(sprint)
 	{
@@ -630,7 +678,6 @@ void keyOperations()
 	}
 	if(!isJumping)
 	{
-        
 		if(keyStates['e'])//(croutch)
 		{
 			croutch = !croutch;
@@ -646,7 +693,6 @@ void keyOperations()
 			}
 		}
 	}
-	//cout << "DIRECTION: " << dirVec[0] << " "<< dirVec[1] << endl;
 	int region = getRegion();
 	
 	//Exit the Game
@@ -1376,10 +1422,6 @@ void drawEntranceRoof()
 void drawDoor()
 {
 	glPushMatrix();
-	/*float matShine[] = {50.0};
-     float matAmbAndDifDoor[] = {0.2, 0.8, 0.5, 1.0};
-     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matAmbAndDifDoor);
-     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShine);*/
 	glTranslatef(0.0,5.0*openFactor,0.0);
 	glBindTexture(GL_TEXTURE_2D, texture[3]);
 	glBegin(GL_POLYGON);
@@ -1391,15 +1433,9 @@ void drawDoor()
 	glPopMatrix();
 }
 
-
-
 void drawLockedDoor1()
 {
 	glPushMatrix();
-	/*float matShine[] = {50.0};
-     float matAmbAndDifDoor[] = {0.2, 0.8, 0.5, 1.0};
-     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matAmbAndDifDoor);
-     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShine);*/
 	glTranslatef(0.0,5.0*lockedDoors[0].openFactor,0.0);
 	glBindTexture(GL_TEXTURE_2D, texture[3]);
 	glBegin(GL_POLYGON);
@@ -1414,10 +1450,6 @@ void drawLockedDoor1()
 void drawLockedDoor2()
 {
 	glPushMatrix();
-	/*float matShine[] = {50.0};
-     float matAmbAndDifDoor[] = {0.2, 0.8, 0.5, 1.0};
-     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matAmbAndDifDoor);
-     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShine);*/
 	glTranslatef(0.0,5.0*lockedDoors[1].openFactor,0.0);
 	glBindTexture(GL_TEXTURE_2D, texture[3]);
 	glBegin(GL_POLYGON);
@@ -1435,9 +1467,6 @@ void writeBitmapString(void *font, char *string)
 	char *c;
 	for (c = string; *c != '\0'; c++) glutBitmapCharacter(font, *c);
 }
-
-
-
 
 void drawWalkWay()
 {	glFrontFace(GL_CW);
@@ -1464,7 +1493,6 @@ void drawName()
 	char *writeable=new char[myName.size()+1];
 	writeable[myName.size()]=0;
 	memcpy(writeable,myName.c_str(),myName.size());
-	
 	glPushMatrix();
 	glColor3f(1.0,0.0,0.0);
 	glScalef(2.0, 2.0, 2.0);
@@ -1484,7 +1512,6 @@ void drawMeter()
 	glVertex2f(29.6, 42.1);
 	glVertex2f(45.4,42.1);
 	glEnd();
-    
 	//Meter
 	if(flashLightBattery > 0)
 	{
@@ -1989,13 +2016,6 @@ int main(int argc, char **argv)
     glutMouseFunc(mouseControl);
     glutPassiveMotionFunc(mouseMotion);
     glutTimerFunc(5, animate, 1);
-	
-	
-    //glutIdleFunc(idle);
-    //makeMenu();
-    /*glutTimerFunc(5, animate, 1);*/
-	
-    glutMainLoop(); 
-    
+    glutMainLoop();
     return 0;  
 }
