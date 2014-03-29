@@ -121,7 +121,6 @@ void evolveParticle(int i)
 
 void drawParticle(particle i)
 {
-	//cout << "x:" << i.xpos << "\ty:" << i.ypos << "\tz:" << i.zpos << endl;
 	float emitLight[] = {1.0,1.0,1.0,1.0};
 	float emitNoLight[] = {0.0,0.0,0.0,1.0};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emitLight);
@@ -239,9 +238,6 @@ void smartLoadExternalTextures()
 // Load external textures.
 void loadExternalTextures()
 {
-    char wd[1024];
-    std::cout << getcwd(wd, sizeof(wd)) << std::endl;
-    
     // Local storage for bmp image data.
     BitMapFile *image[10];
     
@@ -622,7 +618,7 @@ int getRegion()
 bool collisionInRegion(int region)
 {
     return false;
-	cout << "IN REGION: " << region << endl;
+	cout << "CURRENTLY IN REGION: " << region << endl;
 	if(region==1)
 	{
 		if((eyeZ <= -14.0 & eyeX < -1.0) || (eyeZ <= -14.0 & eyeX > 1.0))
